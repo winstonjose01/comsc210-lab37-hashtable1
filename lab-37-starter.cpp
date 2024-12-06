@@ -13,6 +13,7 @@ int sumascii (const string&);
 int gen_hash_index(const string&);
 void display_menu();
 bool find_key (map<int,list<string>> &, int);
+void delete_key (map<int,list<string>> &, int);
 
 int main() {
     // ------------------ PART TWO / THREE --------------------------
@@ -63,6 +64,7 @@ int main() {
         switch (choice)
         {
         case 1: // Search for a key
+            cout << endl;
             cout << "Enter the key you want to find: ";
             cin >> search_key;
             if (find_key(hash_table,search_key))
@@ -73,10 +75,24 @@ int main() {
                     cout << val << "  ";
                 }
             }
+            else
+                cout << "Key: " << search_key << " was NOT found";
             break;
 
         case 2: // Modify a key
-         /* code */
+            cout << "Enter the key you want to delete: ";
+            cin >> search_key;
+            if (find_key(hash_table,search_key))
+                delete_key(hash_table, search_key);
+            else
+            cout << "Key: " << search_key << " was NOT found";
+
+            
+            if (find_key(hash_table,search_key)){
+                cout << "Key: " << search_key << " has been deleted";
+            }
+            else
+                cout << "Error occurred, unable to delete";
             break;
         case 3:
          /* code */
@@ -143,6 +159,10 @@ bool find_key (map<int,list<string>> &hash_table, int search_key){
         return true;
     else
         return false;
+}
+
+void delete_key (map<int,list<string>> &hash_table, int remove_key){
+    hash_table.erase(remove_key);
 }
 
 /* 
