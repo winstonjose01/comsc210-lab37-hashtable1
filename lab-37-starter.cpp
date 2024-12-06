@@ -11,6 +11,8 @@ using namespace std;
 // Function Prototypes
 int sumascii (const string&);
 int gen_hash_index(const string&);
+void display_menu();
+bool find_key (map<int,list<string>> &, int);
 
 int main() {
     // ------------------ PART TWO / THREE --------------------------
@@ -43,7 +45,7 @@ int main() {
     for (const auto& pair: hash_table){
         if (i >= 100) break;     // Stop after 100 entries
         cout << "["<< i+1 << "] Key: " << pair.first << ":" << endl;
-        cout << "\tValues: ";
+        
         for (const auto& val: pair.second){
                 cout << val << "  ";
         }
@@ -52,6 +54,46 @@ int main() {
         
     }
 
+    // Add interactive menu
+    int choice;
+    int search_key;
+    display_menu();
+    cin >> choice;
+    while (choice < 5){
+        switch (choice)
+        {
+        case 1: // Search for a key
+            cout << "Enter the key you want to find: ";
+            cin >> search_key;
+            if (find_key(hash_table,search_key))
+            {
+                cout << "Key: " << search_key << " was found";
+                cout << "\tValues: ";
+                for (const auto& val: hash_table[search_key]){
+                    cout << val << "  ";
+                }
+            }
+            break;
+
+        case 2: // Modify a key
+         /* code */
+            break;
+        case 3:
+         /* code */
+            break;
+        
+        case 4:
+         /* code */
+            break;
+
+        case 5: // Exit
+            return 0;
+            break;
+        
+        default: 
+            break;
+        }
+    }
     // PART TWO - Total ASCII sum
     cout <<"\nTotal ASCII values in the entire file = " << total << endl;
  
@@ -84,6 +126,23 @@ int gen_hash_index(const string &input)
         sum += int(c);  // Calculate the sum of ASCII values
     }
     return sum; // Return the sum as the hash index
+}
+void display_menu(){
+    cout << endl;
+    cout << "[1] Search for a key " << endl;
+    cout << "[2] Add a key " << endl;
+    cout << "[3] Remove a key " << endl;
+    cout << "[4] Modify a key " << endl;
+    cout << "[5] Exit " << endl;
+    cout << "Choose an option --> ";
+}
+
+bool find_key (map<int,list<string>> &hash_table, int search_key){
+    auto it =  hash_table.find(search_key);
+    if (it != hash_table.end()) 
+        return true;
+    else
+        return false;
 }
 
 /* 
