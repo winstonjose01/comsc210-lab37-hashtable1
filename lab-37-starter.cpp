@@ -1,41 +1,63 @@
+// COMSC210 | Lab 37 | Winston Jose
+// IDE Used: Visual Studio Code
+// Github link: https://github.com/winstonjose01/comsc210-lab37-hashtable1 
+
 #include <iostream>
 #include <fstream>
+#include <map>
+#include <list>
 using namespace std;
 
+// Function Prototypes
 int sumascii (const string&);
-
+int gen_hash_index(const string&);
 
 int main() {
-    // char a = 'A';
-    // cout << a << endl;
-    // cout << (int) a << endl;
-    // int b = 66;
-    // cout << b << endl;
-    // cout << (char) b << endl;
-
-    // ------------------ PART TWO --------------------------
+    // ------------------ PART TWO / THREE --------------------------
     string line;
     int total = 0;
     int sum_str = 0;
     ifstream fin("lab-37-data.txt");
+    map<int,list<string>> hash_table;  // Map container to hold hashtable
 
+    // Check if file opened correctly
     if (!fin.is_open()){
         cout << "Error opening file. Aborting" << endl;
         return(1);
     }
 
     while (getline(fin, line)){
-        sum_str = sumascii(line);
-        total += sum_str;
+        int key = gen_hash_index(line); // PART THREE: Generate hash index
+        hash_table[key].push_front(line);   // Insert line into the hash table
+
+        // PART TWO: Calculate total ASCII sum
+        sum_str = sumascii(line); 
+        total += sum_str; 
     }
     fin.clear();
     fin.seekg(0);
-    cout <<"Total ASCII values in the entire file = " << total << endl;
 
-    // ----------------- END OF PART TWO ------------------
+    // PART THREE
+    // Display the first 100 entries of the hash table
+    int i = 0;  // Start from index 0
+    for (const auto& pair: hash_table){
+        if (i >= 100) break;     // Stop after 100 entries
+        cout << "["<< i+1 << "] Key: " << pair.first << ":" << endl;
+        cout << "\tValues: ";
+        for (const auto& val: pair.second){
+                cout << val << "  ";
+        }
+        cout << endl;
+        i++;
+        
+    }
 
-    int part_one = sumascii("helloWORLD"); // for testing total ascii val should be 924
-    cout << "the ascii sum of helloWORLD = " << part_one; // for testing
+    // PART TWO - Total ASCII sum
+    cout <<"\nTotal ASCII values in the entire file = " << total << endl;
+ 
+    // Testing PART ONE functionality
+    int part_one = sumascii("helloWORLD"); // PART ONE - Testing total ascii val should be 924
+    cout << "\nThe ascii sum of helloWORLD = " << part_one; // PART ONE - for testing
     
     return 0;
 }
@@ -47,10 +69,21 @@ int sumascii (const string &input)
 {
     int sum = 0;
     for (char c : input){
-        //cout << c << "=" << int(c) << endl;
-        sum += int(c);
+        sum += int(c);  // Calculate the sum of ASCII values
     }
     return sum;
+}
+
+// PART THREE: This function calculates the hash index based on the ASCII sum
+// arguments: a string input
+// returns : an integer, the total ascii value of the string
+int gen_hash_index(const string &input)
+{
+    int sum = 0;
+    for (char c : input){
+        sum += int(c);  // Calculate the sum of ASCII values
+    }
+    return sum; // Return the sum as the hash index
 }
 
 /* 
