@@ -11,18 +11,21 @@ int main() {
     cout << b << endl;
     cout << (char) b << endl;
 
-    int sum_char = sumascii("A");
-    cout << "the sum is " << sum_char;
+    int sum_char = sumascii("helloWORLD"); // for testing total ascii val should be 924
+    cout << "the sum is " << sum_char; // for testing
     
 
     return 0;
 }
 
-
+// PART ONE - This function calculates the ascii value of a string input
+// arguments: a string input
+// returns : an integer, the total ascii value of the string
 int sumascii (const string &input)
 {
     int sum = 0;
     for (char c : input){
+        //cout << c << "=" << int(c) << endl;
         sum += int(c);
     }
     return sum;
