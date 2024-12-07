@@ -229,6 +229,9 @@ bool modify_key(map<int,list<string>> &hash_table, int search_key, int new_key){
         return false;
 }
 
+// Function to print the first 'entries' entries of the hash table
+// arguments: a hash table and the number of entries to prnt
+// returns" no returns
 void print_hashtable (map<int,list<string>> &hash_table, const int entries){
     int i = 0;  // Start from index 0
     for (const auto& pair: hash_table){
