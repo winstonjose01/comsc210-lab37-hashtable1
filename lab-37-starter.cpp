@@ -6,7 +6,10 @@
 #include <fstream>
 #include <map>
 #include <list>
+#include <thread>
 using namespace std;
+
+const int ENTRIES = 100;
 
 // Function Prototypes
 int sumascii (const string&);
@@ -14,6 +17,9 @@ int gen_hash_index(const string&);
 void display_menu();
 bool find_key (map<int,list<string>> &, int);
 void delete_key (map<int,list<string>> &, int);
+void add_key (map<int,list<string>> &, int );
+bool modify_key(map<int,list<string>> &, int, int);
+void print_hashtable(map<int,list<string>> &, const int);
 
 int main() {
     // ------------------ PART TWO / THREE --------------------------
@@ -40,27 +46,13 @@ int main() {
     fin.clear();
     fin.seekg(0);
 
-    // PART THREE
-    // Display the first 100 entries of the hash table
-    int i = 0;  // Start from index 0
-    for (const auto& pair: hash_table){
-        if (i >= 100) break;     // Stop after 100 entries
-        cout << "["<< i+1 << "] Key: " << pair.first << ":" << endl;
-        
-        for (const auto& val: pair.second){
-                cout << val << "  ";
-        }
-        cout << endl;
-        i++;
-        
-    }
-
     // Add interactive menu
     int choice;
     int search_key;
-    display_menu();
-    cin >> choice;
-    while (choice < 5){
+    int new_key;
+    while (true){
+        display_menu();
+        cin >> choice;
         switch (choice)
         {
         case 1: // Search for a key
@@ -70,43 +62,90 @@ int main() {
             if (find_key(hash_table,search_key))
             {
                 cout << "Key: " << search_key << " was found";
-                cout << "\tValues: ";
+                cout << "\nValues: ";
                 for (const auto& val: hash_table[search_key]){
                     cout << val << "  ";
                 }
+                
             }
             else
-                cout << "Key: " << search_key << " was NOT found";
+                cout << "\nKey: " << search_key << " was NOT found";
+            cout << endl;
             break;
 
-        case 2: // Modify a key
-            cout << "Enter the key you want to delete: ";
+        case 2: // Add a key
+            cout << "\nEnter the key you want to add: ";
+            cin >> search_key;
+            if (find_key(hash_table, search_key))
+            {
+                cout << "Key " << search_key << " already exists and cannot be added";
+                break;
+            }
+            else
+                add_key (hash_table, search_key);
+
+            // Check if the key exists after it was added
+            if (find_key(hash_table,search_key)){
+                cout << "Key: " << search_key << " has been added";
+            }
+            else
+                cout << "\nError occurred, unable to add";
+            cout << endl;
+            break;
+
+        case 3: // Delete a key
+            cout << "\nEnter the key you want to delete: ";
             cin >> search_key;
             if (find_key(hash_table,search_key))
                 delete_key(hash_table, search_key);
             else
-            cout << "Key: " << search_key << " was NOT found";
+                cout << "Key: " << search_key << " was NOT found. Unable to delete";
 
-            
-            if (find_key(hash_table,search_key)){
+            // Chech if the key exists after it was deleted
+            if (!find_key(hash_table,search_key)){
                 cout << "Key: " << search_key << " has been deleted";
             }
             else
-                cout << "Error occurred, unable to delete";
+                cout << "\nError occurred when trying to delete. Unable to proceed.";
+            cout << endl;
             break;
-        case 3:
-         /* code */
-            break;
-        
-        case 4:
-         /* code */
+    
+        case 4: // Modify a key
+            cout << "Enter the key you want to modify: ";
+            cin >> search_key;
+            cout << "Enter the new key :";
+            cin >> new_key;
+            if (find_key(hash_table,search_key)){
+                if (modify_key(hash_table,search_key,new_key)){
+                    cout << "Key: " << search_key << "has been modified to" << new_key;  
+                    cout << "Here is the new key's data: ";
+                    for (const auto &val : hash_table[new_key])
+                        cout << val << " ";
+                } 
+                else
+                {
+                    cout << "\nError occurred, Unable to modify the old key.";
+                }
+            }
+            else
+            {
+                cout << "\nError occurred, key not found. Unable to modify";
+            }
+            cout << endl;
             break;
 
-        case 5: // Exit
+        case 5: // Print the first 100 entries
+            cout << "This the first " << ENTRIES << "of the hash table" << endl;
+            print_hashtable(hash_table,ENTRIES);
+            break;
+
+        case 6: // Exit
             return 0;
             break;
         
         default: 
+            cout << "\nInvalid input. Enter a correct choice number!";
+            cout << endl;
             break;
         }
     }
@@ -143,17 +182,20 @@ int gen_hash_index(const string &input)
     }
     return sum; // Return the sum as the hash index
 }
+
 void display_menu(){
     cout << endl;
+    cout << "---------- HASH TABLE MENU OPTION ----------" << endl;
     cout << "[1] Search for a key " << endl;
     cout << "[2] Add a key " << endl;
     cout << "[3] Remove a key " << endl;
     cout << "[4] Modify a key " << endl;
-    cout << "[5] Exit " << endl;
+    cout << "[5] Print the first 100 entries of the hashtable " << endl;
+    cout << "[6] Exit " << endl;
     cout << "Choose an option --> ";
 }
 
-bool find_key (map<int,list<string>> &hash_table, int search_key){
+bool find_key (map<int,list<string>> &hash_table, const int search_key){
     auto it =  hash_table.find(search_key);
     if (it != hash_table.end()) 
         return true;
@@ -162,7 +204,44 @@ bool find_key (map<int,list<string>> &hash_table, int search_key){
 }
 
 void delete_key (map<int,list<string>> &hash_table, int remove_key){
+    cout << "Deleting key " << remove_key << " with values: ";
+    for (const auto& val: hash_table[remove_key]) 
+        cout << val << " ";
+    cout << "....\n";
+    this_thread::sleep_for(chrono::seconds(3));
     hash_table.erase(remove_key);
+}
+
+void add_key (map<int,list<string>> &hash_table, int add_key){
+    hash_table[add_key] = {};
+}
+
+bool modify_key(map<int,list<string>> &hash_table, int search_key, int new_key){
+    auto it = hash_table.find(search_key);
+
+    if (it != hash_table.end()){
+        list <string> temp = it->second;
+        hash_table.erase(it);
+        hash_table[new_key] = temp;
+        return true;
+    } 
+    else
+        return false;
+}
+
+void print_hashtable (map<int,list<string>> &hash_table, const int entries){
+    int i = 0;  // Start from index 0
+    for (const auto& pair: hash_table){
+        if (i >= entries) break;     // Stop after 100 entries
+        cout << "["<< i+1 << "] Key: " << pair.first << ":" << endl;
+        
+        for (const auto& val: pair.second){
+                cout << val << "  ";
+        }
+        cout << endl;
+        i++;
+        
+    }
 }
 
 /* 
